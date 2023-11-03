@@ -1,6 +1,11 @@
 import "./App.css";
+import "./firebase";
 import { useState } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 function App() {
   const [signUpEmail, setSignUpEmail] = useState("");
@@ -13,9 +18,32 @@ function App() {
     e.preventDefault();
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
-      .then((userCredential) => {
-        console.log(userCredential);
-        const user = userCredential.user;
+      .then(({ user }) => {
+        const { email, uid } = user;
+        // Signed in
+        const newUser = { email, uid };
+
+        console.log(newUser, "Sign Up");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  };
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, signInEmail, signInPassword)
+      .then(({ user }) => {
+        const { email, uid } = user;
+        // Signed in
+        const newUser = { email, uid };
+
+        console.log(newUser, "Sign In");
+
+        // console.log(newUser);
+        // ...
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -33,7 +61,6 @@ function App() {
           }}
           value={signUpEmail}
           type="text"
-          className="email"
         />
         <input
           onChange={(e) => {
@@ -41,12 +68,11 @@ function App() {
           }}
           value={signUpPassword}
           type="text"
-          className="password"
         />
         <button>Submit</button>
       </form>
 
-      <form action="">
+      <form onSubmit={handleSignIn}>
         <h2>Sign In</h2>
         <input
           onChange={(e) => {
@@ -54,7 +80,6 @@ function App() {
           }}
           value={signInEmail}
           type="text"
-          className="email"
         />
         <input
           onChange={(e) => {
@@ -62,7 +87,6 @@ function App() {
           }}
           value={signInPassword}
           type="text"
-          className="password"
         />
         <button>Submit</button>
       </form>
